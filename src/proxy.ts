@@ -29,11 +29,10 @@ export async function proxy(request: NextRequest) {
 
   const isAuthRoute =
     request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/inscription";
-  const isPublicAsset = request.nextUrl.pathname.startsWith("/_next");
   // Le lien de confirmation arrive sans session : il doit passer pour être échangé.
   const isAuthCallback = request.nextUrl.pathname.startsWith("/auth/callback");
 
-  if (!user && !isAuthRoute && !isPublicAsset && !isAuthCallback) {
+  if (!user && !isAuthRoute && !isAuthCallback) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -49,5 +48,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Ne s'exécute pas sur les assets statiques (images publiques, favicon, etc.)
+  matcher: ["/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|svg|ico|webp|gif)$).*)"],
 };

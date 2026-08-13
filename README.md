@@ -55,11 +55,10 @@ Les cinq ministères : **Apôtre**, **Prophète**, **Évangéliste**, **Pasteur*
 ## Installation
 
 ```bash
-cd app
 npm install
 ```
 
-Créer `app/.env.local` :
+Créer `.env.local` à la racine du projet :
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<projet>.supabase.co
@@ -80,20 +79,18 @@ L'application démarre sur `http://localhost:3000`.
 
 ```
 .
-├── app/                     Application Next.js
-│   └── src/
-│       ├── app/
-│       │   ├── login/       Connexion
-│       │   ├── inscription/ Création de compte
-│       │   ├── auth/        Retour du lien de confirmation
-│       │   ├── etudiant/    Espace étudiant
-│       │   ├── enseignant/  Espace enseignant
-│       │   └── admin/       Espace administrateur
-│       ├── components/      Composants partagés
-│       ├── lib/             Accès aux données et client Supabase
-│       └── proxy.ts         Protection des routes
+├── src/
+│   ├── app/
+│   │   ├── login/           Connexion
+│   │   ├── inscription/     Création de compte
+│   │   ├── auth/            Retour du lien de confirmation
+│   │   ├── etudiant/        Espace étudiant
+│   │   ├── enseignant/      Espace enseignant
+│   │   └── admin/           Espace administrateur
+│   ├── components/          Composants partagés
+│   ├── lib/                 Accès aux données et client Supabase
+│   └── proxy.ts             Protection des routes
 ├── emails/                  Modèles d'e-mails pour Supabase
-├── CAHIER_DES_CHARGES.md    Spécifications fonctionnelles
 └── README.md
 ```
 
@@ -147,10 +144,9 @@ Le modèle d'e-mail de confirmation se trouve dans [`emails/confirmation-inscrip
 
 ## Déploiement sur Vercel
 
-1. Importer le dépôt dans Vercel
-2. **Root Directory** : `app`
-3. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Après le déploiement, reporter l'URL obtenue dans la configuration Supabase (voir ci-dessus)
+1. Importer le dépôt dans Vercel (aucun réglage de Root Directory à changer, le projet est à la racine)
+2. Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Après le déploiement, reporter l'URL obtenue dans la configuration Supabase (voir ci-dessus)
 
 ---
 
