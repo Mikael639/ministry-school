@@ -1,0 +1,124 @@
+<!-- ============================================================
+     Ministry School — E-mail de confirmation d'inscription
+     À coller dans Supabase : Authentication > Emails > Confirm signup
+     Variable Supabase utilisée : {{ .ConfirmationURL }}
+     ============================================================ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f9;padding:32px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <tr>
+    <td align="center">
+
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+
+        <!-- En-tête -->
+        <tr>
+          <td align="center" style="background-color:#0B1526;padding:32px 24px;">
+            <div style="font-size:20px;font-weight:700;letter-spacing:4px;color:#ffffff;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">
+              Ministry
+            </div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:6px;color:#cbd5e1;text-transform:uppercase;margin-top:6px;">
+              School
+            </div>
+            <div style="font-size:10px;letter-spacing:3px;color:#94a3b8;text-transform:uppercase;margin-top:12px;">
+              Grandir &bull; Servir &bull; Impacter
+            </div>
+          </td>
+        </tr>
+
+        <!-- Corps -->
+        <tr>
+          <td style="padding:32px 32px 8px 32px;">
+            <h1 style="margin:0 0 16px 0;font-size:20px;font-weight:700;color:#0f172a;">
+              Confirmez votre adresse e-mail
+            </h1>
+
+            <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#334155;">
+              Bonjour,
+            </p>
+
+            <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#334155;">
+              Vous venez de créer votre compte sur la plateforme <strong>Ministry School</strong>,
+              l'espace de formation qui vous permettra de suivre vos cours, consulter votre
+              calendrier et accéder aux supports partagés par vos enseignants.
+            </p>
+
+            <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#334155;">
+              Pour activer votre compte, cliquez sur le bouton ci-dessous :
+            </p>
+          </td>
+        </tr>
+
+        <!-- Bouton -->
+        <tr>
+          <td align="center" style="padding:0 32px 28px 32px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="background-color:#0B1526;border-radius:8px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">
+                    Confirmer mon inscription
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Lien de secours -->
+        <tr>
+          <td style="padding:0 32px 24px 32px;">
+            <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:#64748b;">
+              Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :
+            </p>
+            <p style="margin:0;font-size:12px;line-height:1.5;word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" style="color:#2563eb;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- Encadré prochaine étape -->
+        <tr>
+          <td style="padding:0 32px 28px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+              <tr>
+                <td style="padding:16px 18px;">
+                  <p style="margin:0 0 6px 0;font-size:13px;font-weight:700;color:#0f172a;">
+                    Et ensuite ?
+                  </p>
+                  <p style="margin:0;font-size:13px;line-height:1.6;color:#475569;">
+                    Une fois votre adresse confirmée, votre accès aux cours sera ouvert dès
+                    l'enregistrement de votre règlement par l'équipe administrative.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Note de sécurité -->
+        <tr>
+          <td style="padding:0 32px 32px 32px;border-top:1px solid #f1f5f9;padding-top:20px;">
+            <p style="margin:0;font-size:12px;line-height:1.6;color:#94a3b8;">
+              Vous n'êtes pas à l'origine de cette demande ? Ignorez simplement ce message,
+              aucun compte ne sera activé. Ce lien expire dans 24 heures.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Pied de page -->
+        <tr>
+          <td align="center" style="background-color:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;">
+            <p style="margin:0 0 4px 0;font-size:12px;font-weight:600;color:#475569;">
+              Ministry School
+            </p>
+            <p style="margin:0;font-size:11px;line-height:1.5;color:#94a3b8;">
+              Message automatique — merci de ne pas y répondre.<br />
+              Pour toute question, rapprochez-vous de l'équipe Ministry School.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>

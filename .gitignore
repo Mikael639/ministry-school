@@ -1,0 +1,34 @@
+# Dépendances
+node_modules/
+.pnp
+.pnp.*
+
+# Build Next.js
+.next/
+out/
+build/
+next-env.d.ts
+
+# Variables d'environnement — ne jamais versionner
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Logs et divers
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# Outils locaux
+.claude/
+
+# Document de travail interne — reste en local
+CAHIER_DES_CHARGES.md
