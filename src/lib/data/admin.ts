@@ -64,3 +64,21 @@ export async function getAllUsers(supabase: SupabaseClient) {
 
   return (data ?? []) as unknown as AdminUser[];
 }
+
+export type Ministry = { id: string; slug: string; name: string };
+
+export async function getMinistries(supabase: SupabaseClient) {
+  const { data } = await supabase.from("ministries").select("id, slug, name").order("name");
+  return (data ?? []) as Ministry[];
+}
+
+export type Teacher = { id: string; full_name: string };
+
+export async function getTeachers(supabase: SupabaseClient) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .eq("role", "teacher")
+    .order("full_name");
+  return (data ?? []) as Teacher[];
+}
