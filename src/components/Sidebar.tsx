@@ -95,8 +95,8 @@ const studentSections: NavSection[] = [
     title: "Pédagogie",
     items: [
       { label: "Mes cours", href: "/etudiant/cours", icon: icons.book },
-      { label: "Palier", href: "/etudiant/palier", icon: icons.layers },
-      { label: "Formation", href: "/etudiant/formation", icon: icons.compass },
+      { label: "Ma formation", href: "/etudiant/palier", icon: icons.layers },
+      { label: "Ministère", href: "/etudiant/formation", icon: icons.compass },
     ],
   },
   {
@@ -119,6 +119,7 @@ const teacherSections: NavSection[] = [
     items: [
       { label: "Supports & consignes", href: "/enseignant/supports", icon: icons.megaphone },
       { label: "Vue promo", href: "/enseignant/programme", icon: icons.globe },
+      { label: "Socles", href: "/enseignant/socles", icon: icons.layers },
     ],
   },
   {

@@ -1,10 +1,16 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getStudentAllSessions, getStudentProfile } from "@/lib/data/student";
+import {
+  getStudentAllSessions,
+  getStudentNewCounts,
+  getStudentProfile,
+} from "@/lib/data/student";
 import { formatSessionDate, formatTimeRange } from "@/lib/format";
 import WeekCalendar from "@/components/WeekCalendar";
 import ProgressRing from "@/components/ProgressRing";
 import SessionTypeBadge from "@/components/SessionTypeBadge";
 import QuickLinks from "@/components/QuickLinks";
+import { markNotificationsSeen } from "./actions";
 
 export default async function StudentDashboardPage() {
   const supabase = await createClient();
@@ -12,8 +18,15 @@ export default async function StudentDashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { ministryName, preferredDay } = await getStudentProfile(supabase, user!.id);
+  const { ministryName, preferredDay, notificationsSeenAt } = await getStudentProfile(
+    supabase,
+    user!.id
+  );
   const allSessions = await getStudentAllSessions(supabase, user!.id);
+
+  const sessionIds = allSessions.map((s) => s.id);
+  const newCounts = await getStudentNewCounts(supabase, sessionIds, notificationsSeenAt);
+  const totalNew = newCounts.materials + newCounts.assignments;
 
   const today = new Date().toISOString().slice(0, 10);
   const nextSession = allSessions.find((s) => s.session_date >= today);
@@ -43,6 +56,46 @@ export default async function StudentDashboardPage() {
               </>
             )}
           </p>
+        )}
+
+        {totalNew > 0 && (
+          <section className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-sm text-foreground">
+                <span className="flex h-2 w-2 shrink-0 rounded-full bg-accent" />
+                <span>
+                  {newCounts.assignments > 0 && (
+                    <>
+                      <span className="font-medium">
+                        {newCounts.assignments} nouvelle{newCounts.assignments > 1 ? "s" : ""}{" "}
+                        consigne{newCounts.assignments > 1 ? "s" : ""}
+                      </span>
+                    </>
+                  )}
+                  {newCounts.assignments > 0 && newCounts.materials > 0 && " · "}
+                  {newCounts.materials > 0 && (
+                    <span className="font-medium">
+                      {newCounts.materials} nouveau{newCounts.materials > 1 ? "x" : ""} document
+                      {newCounts.materials > 1 ? "s" : ""}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/etudiant/cours"
+                  className="text-sm font-medium text-accent hover:underline"
+                >
+                  Voir mes cours
+                </Link>
+                <form action={markNotificationsSeen}>
+                  <button type="submit" className="text-xs text-muted hover:text-foreground">
+                    Marquer comme lu
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
         )}
 
         <section className="rounded-lg border border-border bg-background p-6">
@@ -90,8 +143,8 @@ export default async function StudentDashboardPage() {
           links={[
             { label: "Mes cours", href: "/etudiant/cours", icon: "book" },
             { label: "Mon calendrier", href: "/etudiant/calendrier", icon: "calendar" },
-            { label: "Palier", href: "/etudiant/palier", icon: "layers" },
-            { label: "Formation", href: "/etudiant/formation", icon: "compass" },
+            { label: "Ma formation", href: "/etudiant/palier", icon: "layers" },
+            { label: "Ministère", href: "/etudiant/formation", icon: "compass" },
           ]}
         />
       </div>

@@ -16,15 +16,40 @@ export type StudentSession = {
 export async function getStudentProfile(supabase: SupabaseClient, userId: string) {
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, preferred_day, ministries(name)")
+    .select("full_name, preferred_day, notifications_seen_at, ministries(name)")
     .eq("id", userId)
     .single();
 
   return {
     fullName: data?.full_name as string | undefined,
     preferredDay: data?.preferred_day as string | null | undefined,
+    notificationsSeenAt: data?.notifications_seen_at as string,
     ministryName: (data?.ministries as unknown as { name: string } | null)?.name,
   };
+}
+
+export async function getStudentNewCounts(
+  supabase: SupabaseClient,
+  sessionIds: string[],
+  since: string
+) {
+  if (!sessionIds.length) return { materials: 0, assignments: 0 };
+
+  const [{ count: materials }, { count: assignments }] = await Promise.all([
+    supabase
+      .from("materials")
+      .select("id", { count: "exact", head: true })
+      .in("session_id", sessionIds)
+      .lte("visible_at", new Date().toISOString())
+      .gt("visible_at", since),
+    supabase
+      .from("assignments")
+      .select("id", { count: "exact", head: true })
+      .in("session_id", sessionIds)
+      .gt("created_at", since),
+  ]);
+
+  return { materials: materials ?? 0, assignments: assignments ?? 0 };
 }
 
 async function getMinistrySessions(supabase: SupabaseClient, userId: string) {
