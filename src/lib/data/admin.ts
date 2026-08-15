@@ -3,25 +3,66 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export async function getGlobalStats(supabase: SupabaseClient) {
   const [
     { count: studentCount },
+    { count: confirmedCount },
     { count: teacherCount },
     { count: sessionCount },
     { count: materialCount },
-    { count: submissionCount },
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student"),
+    supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "student")
+      .eq("email_confirmed", true),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "teacher"),
     supabase.from("sessions").select("id", { count: "exact", head: true }),
     supabase.from("materials").select("id", { count: "exact", head: true }),
-    supabase.from("submissions").select("id", { count: "exact", head: true }),
   ]);
 
+  const students = studentCount ?? 0;
+  const confirmed = confirmedCount ?? 0;
+
   return {
-    studentCount: studentCount ?? 0,
+    studentCount: students,
+    confirmedCount: confirmed,
+    pendingCount: students - confirmed,
     teacherCount: teacherCount ?? 0,
     sessionCount: sessionCount ?? 0,
     materialCount: materialCount ?? 0,
-    submissionCount: submissionCount ?? 0,
   };
+}
+
+export type EnrollmentBreakdown = {
+  byMinistry: { name: string; count: number }[];
+  byDay: { day: string; count: number }[];
+};
+
+export async function getEnrollmentBreakdown(
+  supabase: SupabaseClient
+): Promise<EnrollmentBreakdown> {
+  const [{ data: ministries }, { data: students }] = await Promise.all([
+    supabase.from("ministries").select("id, name").order("name"),
+    supabase.from("profiles").select("ministry_id, preferred_day").eq("role", "student"),
+  ]);
+
+  const rows = students ?? [];
+
+  const byMinistry = (ministries ?? []).map((m) => ({
+    name: m.name as string,
+    count: rows.filter((s) => s.ministry_id === m.id).length,
+  }));
+
+  const unassigned = rows.filter((s) => !s.ministry_id).length;
+  if (unassigned > 0) {
+    byMinistry.push({ name: "Non renseigné", count: unassigned });
+  }
+
+  const byDay = [
+    { day: "Samedi", count: rows.filter((s) => s.preferred_day === "samedi").length },
+    { day: "Dimanche", count: rows.filter((s) => s.preferred_day === "dimanche").length },
+  ];
+
+  return { byMinistry, byDay };
 }
 
 export type AdminSession = {
@@ -51,16 +92,28 @@ export type AdminUser = {
   id: string;
   full_name: string;
   role: string;
-  has_paid: boolean;
+  preferred_day: string | null;
+  email_confirmed: boolean;
+  created_at: string;
   ministries: { name: string } | null;
 };
 
 export async function getAllUsers(supabase: SupabaseClient) {
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, role, has_paid, ministries(name)")
+    .select("id, full_name, role, preferred_day, email_confirmed, created_at, ministries(name)")
     .order("role")
     .order("full_name");
+
+  return (data ?? []) as unknown as AdminUser[];
+}
+
+export async function getStudents(supabase: SupabaseClient) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name, role, preferred_day, email_confirmed, created_at, ministries(name)")
+    .eq("role", "student")
+    .order("created_at", { ascending: false });
 
   return (data ?? []) as unknown as AdminUser[];
 }

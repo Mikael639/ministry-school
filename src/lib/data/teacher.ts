@@ -73,31 +73,6 @@ export async function getTeacherAssignments(supabase: SupabaseClient, sessionIds
   return data ?? [];
 }
 
-export type AssignmentSubmission = {
-  id: string;
-  assignment_id: string;
-  content: string;
-  submitted_at: string;
-  student: { full_name: string } | null;
-};
-
-export async function getSubmissionsForAssignments(
-  supabase: SupabaseClient,
-  assignmentIds: string[]
-) {
-  if (!assignmentIds.length) return [];
-
-  const { data } = await supabase
-    .from("submissions")
-    .select(
-      "id, assignment_id, content, submitted_at, student:profiles!submissions_student_id_fkey(full_name)"
-    )
-    .in("assignment_id", assignmentIds)
-    .order("submitted_at", { ascending: false });
-
-  return (data ?? []) as unknown as AssignmentSubmission[];
-}
-
 export type EnrolledStudent = {
   id: string;
   full_name: string;

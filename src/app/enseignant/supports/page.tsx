@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import {
-  getSubmissionsForAssignments,
   getTeacherAssignments,
   getTeacherMaterials,
   getTeacherSessions,
@@ -23,8 +22,6 @@ export default async function TeacherSupportsPage() {
     getTeacherMaterials(supabase, sessionIds),
     getTeacherAssignments(supabase, sessionIds),
   ]);
-  const assignmentIds = assignments.map((a) => a.id);
-  const submissions = await getSubmissionsForAssignments(supabase, assignmentIds);
 
   if (!allSessions.length) {
     return (
@@ -172,29 +169,12 @@ export default async function TeacherSupportsPage() {
         </form>
 
         {assignments.length > 0 && (
-          <ul className="mt-6 space-y-4 border-t border-border pt-4">
-            {assignments.map((a) => {
-              const responses = submissions.filter((s) => s.assignment_id === a.id);
-              return (
-                <li key={a.id}>
-                  <p className="text-sm text-foreground">{a.instructions}</p>
-                  {responses.length > 0 ? (
-                    <ul className="mt-2 space-y-2 rounded-md bg-surface p-3">
-                      {responses.map((r) => (
-                        <li key={r.id} className="text-sm">
-                          <span className="font-medium text-foreground">
-                            {r.student?.full_name ?? "Étudiant"}
-                          </span>{" "}
-                          <span className="text-muted">— {r.content}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-1 text-xs text-muted">Aucun rendu pour le moment.</p>
-                  )}
-                </li>
-              );
-            })}
+          <ul className="mt-6 space-y-3 border-t border-border pt-4">
+            {assignments.map((a) => (
+              <li key={a.id} className="text-sm text-foreground">
+                {a.instructions}
+              </li>
+            ))}
           </ul>
         )}
       </section>

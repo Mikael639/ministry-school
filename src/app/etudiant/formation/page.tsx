@@ -21,7 +21,7 @@ export default async function StudentFormationPage() {
 
   return (
     <section className="rounded-lg border border-border bg-background p-6">
-      <h2 className="mb-1 text-sm font-medium tracking-wide text-muted">MINISTÈRE</h2>
+      <h2 className="mb-1 text-sm font-medium tracking-wide text-muted">MINISTÈRES</h2>
       <p className="mb-6 text-sm text-muted">
         À partir de janvier, les cours se poursuivent par ministère à MLK Studio, le samedi et le
         dimanche (mêmes contenus, au choix de l&apos;étudiant).

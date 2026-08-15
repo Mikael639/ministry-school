@@ -96,7 +96,7 @@ const studentSections: NavSection[] = [
     items: [
       { label: "Mes cours", href: "/etudiant/cours", icon: icons.book },
       { label: "Ma formation", href: "/etudiant/palier", icon: icons.layers },
-      { label: "Ministère", href: "/etudiant/formation", icon: icons.compass },
+      { label: "Ministères", href: "/etudiant/formation", icon: icons.compass },
     ],
   },
   {

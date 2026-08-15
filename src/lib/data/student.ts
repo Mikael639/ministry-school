@@ -122,23 +122,3 @@ export async function getStudentAssignments(supabase: SupabaseClient, sessionIds
 
   return data ?? [];
 }
-
-export async function getStudentSubmissions(
-  supabase: SupabaseClient,
-  userId: string,
-  assignmentIds: string[]
-) {
-  if (!assignmentIds.length) return new Map<string, { content: string; submitted_at: string }>();
-
-  const { data } = await supabase
-    .from("submissions")
-    .select("assignment_id, content, submitted_at")
-    .eq("student_id", userId)
-    .in("assignment_id", assignmentIds);
-
-  const map = new Map<string, { content: string; submitted_at: string }>();
-  for (const row of data ?? []) {
-    map.set(row.assignment_id, { content: row.content, submitted_at: row.submitted_at });
-  }
-  return map;
-}

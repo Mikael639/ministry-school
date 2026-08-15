@@ -47,7 +47,7 @@ export default async function TeacherSoclesPage() {
               </button>
             </form>
             <p className="mt-2 text-xs text-muted">
-              Visible par les étudiants tant que ce champ est vide : « Date à venir ».
+              Visible par les étudiants tant que ce champ est vide : « Date à définir ».
             </p>
           </li>
         ))}

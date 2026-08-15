@@ -39,7 +39,7 @@ export default async function StudentPalierPage() {
         {socles.map((s) => (
           <li key={s.id} className="rounded-md border border-border p-4">
             <p className="mb-1 font-medium text-foreground">{s.label}</p>
-            <p className="text-sm text-muted">{s.custom_label || "Date à venir"}</p>
+            <p className="text-sm text-muted">{s.custom_label || "Date à définir"}</p>
             {s.description && <p className="mt-2 text-sm text-foreground/80">{s.description}</p>}
           </li>
         ))}

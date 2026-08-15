@@ -144,7 +144,7 @@ export default async function StudentDashboardPage() {
             { label: "Mes cours", href: "/etudiant/cours", icon: "book" },
             { label: "Mon calendrier", href: "/etudiant/calendrier", icon: "calendar" },
             { label: "Ma formation", href: "/etudiant/palier", icon: "layers" },
-            { label: "Ministère", href: "/etudiant/formation", icon: "compass" },
+            { label: "Ministères", href: "/etudiant/formation", icon: "compass" },
           ]}
         />
       </div>
