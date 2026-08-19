@@ -41,6 +41,7 @@ export default async function StudentDashboardPage() {
     end_time: s.end_time,
     location: s.location,
     room: s.room,
+    teacher: s.teacher?.full_name ?? null,
   }));
 
   return (
