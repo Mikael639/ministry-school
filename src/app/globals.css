@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 :root {
+  /* Neutres légèrement chauds, pour s'accorder à l'ambre plutôt que le contrarier */
   --background: #ffffff;
-  --foreground: #111113;
-  --muted: #6b7280;
-  --border: #e4e4e7;
-  --surface: #fafafa;
-  --accent: #111113;
+  --foreground: #1c1917;
+  --muted: #78716c;
+  --border: #e7e5e4;
+  --surface: #fafaf9;
+
+  /* Ambre : fait écho à la flamme du logo. Contraste 5.0 sur blanc (AA). */
+  --accent: #b45309;
   --on-accent: #ffffff;
+
+  /* Bleu nuit de la page de connexion, pour les fonds sombres */
+  --deep: #0b1526;
 }
 
 @theme inline {
@@ -18,6 +24,7 @@
   --color-surface: var(--surface);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-deep: var(--deep);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

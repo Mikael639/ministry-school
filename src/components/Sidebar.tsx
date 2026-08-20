@@ -1,8 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
+
+function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {direction === "left" ? <path d="m15 18-6-6 6-6" /> : <path d="m9 18 6-6-6-6" />}
+    </svg>
+  );
+}
 
 type NavItem = {
   label: string;
@@ -161,21 +180,70 @@ const adminSections: NavSection[] = [
 
 export default function Sidebar({ role }: { role: "student" | "teacher" | "admin" }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
   const sections =
     role === "student" ? studentSections : role === "teacher" ? teacherSections : adminSections;
 
+  // Restaure le choix de l'utilisateur d'une visite à l'autre
+  useEffect(() => {
+    setCollapsed(localStorage.getItem("sidebar-collapsed") === "1");
+  }, []);
+
+  function toggle() {
+    setCollapsed((current) => {
+      const next = !current;
+      localStorage.setItem("sidebar-collapsed", next ? "1" : "0");
+      return next;
+    });
+  }
+
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-border bg-background md:flex md:flex-col">
-      <div className="px-5 py-5 text-foreground">
-        <Logo size={30} />
+    <aside
+      className={`hidden shrink-0 border-r border-border bg-background transition-[width] duration-200 md:flex md:flex-col ${
+        collapsed ? "w-16" : "w-60"
+      }`}
+    >
+      <div
+        className={`flex items-center py-5 text-foreground ${
+          collapsed ? "justify-center px-2" : "justify-between px-5"
+        }`}
+      >
+        {collapsed ? <Logo size={26} variant="mark" /> : <Logo size={30} />}
+        {!collapsed && (
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label="Réduire le menu"
+            title="Réduire le menu"
+            className="rounded-md p-1 text-muted transition hover:bg-surface hover:text-foreground"
+          >
+            <ChevronIcon direction="left" />
+          </button>
+        )}
       </div>
 
-      <nav className="flex-1 space-y-6 px-3 pb-6">
+      {collapsed && (
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label="Déployer le menu"
+          title="Déployer le menu"
+          className="mx-auto mb-2 rounded-md p-1 text-muted transition hover:bg-surface hover:text-foreground"
+        >
+          <ChevronIcon direction="right" />
+        </button>
+      )}
+
+      <nav className={`flex-1 space-y-6 pb-6 ${collapsed ? "px-2" : "px-3"}`}>
         {sections.map((section) => (
           <div key={section.title}>
-            <p className="mb-2 px-3 text-xs font-medium uppercase tracking-wide text-muted">
-              {section.title}
-            </p>
+            {collapsed ? (
+              <div className="mx-3 mb-2 border-t border-border" aria-hidden="true" />
+            ) : (
+              <p className="mb-2 px-3 text-xs font-medium uppercase tracking-wide text-muted">
+                {section.title}
+              </p>
+            )}
             <ul className="space-y-0.5">
               {section.items.map((item) => {
                 const active = pathname === item.href;
@@ -183,14 +251,17 @@ export default function Sidebar({ role }: { role: "student" | "teacher" | "admin
                   <li key={item.label}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition ${
+                      title={collapsed ? item.label : undefined}
+                      className={`flex items-center rounded-md py-2 text-sm transition ${
+                        collapsed ? "justify-center px-2" : "gap-2.5 px-3"
+                      } ${
                         active
                           ? "bg-accent/10 font-medium text-accent"
                           : "text-foreground/80 hover:bg-surface hover:text-foreground"
                       }`}
                     >
                       <span className={active ? "text-accent" : "text-muted"}>{item.icon}</span>
-                      {item.label}
+                      {!collapsed && item.label}
                     </Link>
                   </li>
                 );
