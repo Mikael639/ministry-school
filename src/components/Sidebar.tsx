@@ -100,6 +100,10 @@ const studentSections: NavSection[] = [
     ],
   },
   {
+    title: "Communication",
+    items: [{ label: "Messages", href: "/etudiant/messages", icon: icons.megaphone }],
+  },
+  {
     title: "Compte",
     items: [{ label: "Profil", href: "/etudiant/profil", icon: icons.user }],
   },
@@ -121,6 +125,10 @@ const teacherSections: NavSection[] = [
       { label: "Vue promo", href: "/enseignant/programme", icon: icons.globe },
       { label: "Socles", href: "/enseignant/socles", icon: icons.layers },
     ],
+  },
+  {
+    title: "Communication",
+    items: [{ label: "Messages", href: "/enseignant/messages", icon: icons.megaphone }],
   },
   {
     title: "Suivi",

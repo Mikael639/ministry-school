@@ -40,7 +40,15 @@ export async function getStudentNewCounts(
   sessionIds: string[],
   since: string
 ) {
-  if (!sessionIds.length) return { materials: 0, assignments: 0 };
+  // Les annonces ne dépendent pas des séances : elles sont filtrées par RLS
+  const { count: messages } = await supabase
+    .from("announcements")
+    .select("id", { count: "exact", head: true })
+    .gt("created_at", since);
+
+  if (!sessionIds.length) {
+    return { materials: 0, assignments: 0, messages: messages ?? 0 };
+  }
 
   const [{ count: materials }, { count: assignments }] = await Promise.all([
     supabase
@@ -56,7 +64,11 @@ export async function getStudentNewCounts(
       .gt("created_at", since),
   ]);
 
-  return { materials: materials ?? 0, assignments: assignments ?? 0 };
+  return {
+    materials: materials ?? 0,
+    assignments: assignments ?? 0,
+    messages: messages ?? 0,
+  };
 }
 
 /**

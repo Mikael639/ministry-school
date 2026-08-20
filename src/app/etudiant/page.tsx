@@ -26,7 +26,20 @@ export default async function StudentDashboardPage() {
 
   const sessionIds = allSessions.map((s) => s.id);
   const newCounts = await getStudentNewCounts(supabase, sessionIds, notificationsSeenAt);
-  const totalNew = newCounts.materials + newCounts.assignments;
+  const totalNew = newCounts.materials + newCounts.assignments + newCounts.messages;
+
+  const plural = (n: number, singulier: string, pluriel: string) =>
+    `${n} ${n > 1 ? pluriel : singulier}`;
+
+  const newsLabel = [
+    newCounts.messages > 0 && plural(newCounts.messages, "nouveau message", "nouveaux messages"),
+    newCounts.assignments > 0 &&
+      plural(newCounts.assignments, "nouvelle consigne", "nouvelles consignes"),
+    newCounts.materials > 0 &&
+      plural(newCounts.materials, "nouveau document", "nouveaux documents"),
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const today = new Date().toISOString().slice(0, 10);
   const nextSession = allSessions.find((s) => s.session_date >= today);
@@ -65,30 +78,14 @@ export default async function StudentDashboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm text-foreground">
                 <span className="flex h-2 w-2 shrink-0 rounded-full bg-accent" />
-                <span>
-                  {newCounts.assignments > 0 && (
-                    <>
-                      <span className="font-medium">
-                        {newCounts.assignments} nouvelle{newCounts.assignments > 1 ? "s" : ""}{" "}
-                        consigne{newCounts.assignments > 1 ? "s" : ""}
-                      </span>
-                    </>
-                  )}
-                  {newCounts.assignments > 0 && newCounts.materials > 0 && " · "}
-                  {newCounts.materials > 0 && (
-                    <span className="font-medium">
-                      {newCounts.materials} nouveau{newCounts.materials > 1 ? "x" : ""} document
-                      {newCounts.materials > 1 ? "s" : ""}
-                    </span>
-                  )}
-                </span>
+                <span className="font-medium">{newsLabel}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Link
-                  href="/etudiant/cours"
+                  href={newCounts.messages > 0 ? "/etudiant/messages" : "/etudiant/cours"}
                   className="text-sm font-medium text-accent hover:underline"
                 >
-                  Voir mes cours
+                  {newCounts.messages > 0 ? "Voir les messages" : "Voir mes cours"}
                 </Link>
                 <form action={markNotificationsSeen}>
                   <button type="submit" className="text-xs text-muted hover:text-foreground">
