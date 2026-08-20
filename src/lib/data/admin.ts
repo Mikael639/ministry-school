@@ -74,6 +74,7 @@ export type AdminSession = {
   room: string | null;
   session_type: "commun" | "ministere";
   ministries: { name: string } | null;
+  courses: { title: string } | null;
   teacher: { full_name: string } | null;
 };
 
@@ -81,9 +82,10 @@ export async function getAllSessions(supabase: SupabaseClient) {
   const { data } = await supabase
     .from("sessions")
     .select(
-      "id, session_date, start_time, end_time, location, room, session_type, ministries(name), teacher:profiles!sessions_teacher_id_fkey(full_name)"
+      "id, session_date, start_time, end_time, location, room, session_type, ministries(name), courses(title), teacher:profiles!sessions_teacher_id_fkey(full_name)"
     )
-    .order("session_date", { ascending: true });
+    .order("session_date", { ascending: true })
+    .order("start_time", { ascending: true });
 
   return (data ?? []) as unknown as AdminSession[];
 }
@@ -123,6 +125,22 @@ export type Ministry = { id: string; slug: string; name: string };
 export async function getMinistries(supabase: SupabaseClient) {
   const { data } = await supabase.from("ministries").select("id, slug, name").order("name");
   return (data ?? []) as Ministry[];
+}
+
+export type Course = {
+  id: string;
+  title: string;
+  description: string | null;
+  objectives: string | null;
+  ministries: { name: string } | null;
+};
+
+export async function getCourses(supabase: SupabaseClient) {
+  const { data } = await supabase
+    .from("courses")
+    .select("id, title, description, objectives, ministries(name)")
+    .order("title");
+  return (data ?? []) as unknown as Course[];
 }
 
 export type Teacher = { id: string; full_name: string };

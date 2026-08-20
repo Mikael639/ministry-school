@@ -8,6 +8,7 @@ export async function createSession(formData: FormData) {
 
   const sessionType = formData.get("session_type") as string;
   const ministryId = formData.get("ministry_id") as string;
+  const courseId = formData.get("course_id") as string;
   const teacherId = formData.get("teacher_id") as string;
   const sessionDate = formData.get("session_date") as string;
   const startTime = formData.get("start_time") as string;
@@ -20,6 +21,7 @@ export async function createSession(formData: FormData) {
   const { error } = await supabase.from("sessions").insert({
     session_type: sessionType,
     ministry_id: sessionType === "commun" ? null : ministryId || null,
+    course_id: courseId || null,
     teacher_id: teacherId || null,
     session_date: sessionDate,
     start_time: startTime,

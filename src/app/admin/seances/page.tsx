@@ -1,15 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import { getAllSessions, getMinistries, getTeachers } from "@/lib/data/admin";
+import { getAllSessions, getCourses, getMinistries, getTeachers } from "@/lib/data/admin";
 import { formatSessionDate, formatTimeRange } from "@/lib/format";
 import SessionTypeBadge from "@/components/SessionTypeBadge";
 import { createSession, deleteSession } from "./actions";
 
 export default async function AdminSessionsPage() {
   const supabase = await createClient();
-  const [sessions, ministries, teachers] = await Promise.all([
+  const [sessions, ministries, teachers, courses] = await Promise.all([
     getAllSessions(supabase),
     getMinistries(supabase),
     getTeachers(supabase),
+    getCourses(supabase),
   ]);
 
   return (
@@ -42,6 +43,21 @@ export default async function AdminSessionsPage() {
               {ministries.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs text-muted">Cours</label>
+            <select
+              name="course_id"
+              className="w-full rounded-md border border-border px-3 py-2 text-sm"
+            >
+              <option value="">— Aucun cours rattaché —</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
                 </option>
               ))}
             </select>
@@ -154,9 +170,10 @@ export default async function AdminSessionsPage() {
                 key={s.id}
                 className="flex flex-col gap-1 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
               >
-                <span className="flex items-center gap-2 text-foreground">
+                <span className="flex flex-wrap items-center gap-2 text-foreground">
                   {formatSessionDate(s.session_date)}
                   <SessionTypeBadge type={s.session_type} />
+                  {s.courses && <span className="font-medium">· {s.courses.title}</span>}
                   {s.ministries && <span className="text-muted">· {s.ministries.name}</span>}
                 </span>
                 <span className="flex items-center gap-3 text-muted">

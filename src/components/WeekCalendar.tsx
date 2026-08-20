@@ -10,6 +10,7 @@ export type CalendarSession = {
   location: string;
   room: string | null;
   teacher?: string | null;
+  course?: string | null;
 };
 
 function startOfWeek(date: Date) {
@@ -154,6 +155,7 @@ export default function WeekCalendar({ sessions }: { sessions: CalendarSession[]
                 <p className="font-medium text-foreground">
                   {s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}
                 </p>
+                {s.course && <p className="text-foreground">{s.course}</p>}
                 <p className="text-muted">
                   {s.location}
                   {s.room ? ` · ${s.room}` : ""}

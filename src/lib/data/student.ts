@@ -10,19 +10,26 @@ export type StudentSession = {
   day: string;
   session_type: "commun" | "ministere";
   description: string | null;
+  objectives: string | null;
+  course_id: string | null;
+  courses: { id: string; title: string } | null;
   teacher: { full_name: string } | null;
 };
+
+const SESSION_FIELDS =
+  "id, session_date, start_time, end_time, location, room, day, session_type, description, objectives, course_id, courses(id, title), teacher:profiles!sessions_teacher_id_fkey(full_name)";
 
 export async function getStudentProfile(supabase: SupabaseClient, userId: string) {
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, preferred_day, notifications_seen_at, ministries(name)")
+    .select("full_name, preferred_day, ministry_id, notifications_seen_at, ministries(name)")
     .eq("id", userId)
     .single();
 
   return {
     fullName: data?.full_name as string | undefined,
     preferredDay: data?.preferred_day as string | null | undefined,
+    ministryId: data?.ministry_id as string | null | undefined,
     notificationsSeenAt: data?.notifications_seen_at as string,
     ministryName: (data?.ministries as unknown as { name: string } | null)?.name,
   };
@@ -52,26 +59,48 @@ export async function getStudentNewCounts(
   return { materials: materials ?? 0, assignments: assignments ?? 0 };
 }
 
+/**
+ * Un étudiant suit les séances de son ministère, le jour qu'il a choisi.
+ * Le rattachement est déduit de son profil : il n'y a pas d'inscription
+ * séance par séance à effectuer.
+ */
 async function getMinistrySessions(supabase: SupabaseClient, userId: string) {
-  const { data: enrollments } = await supabase
-    .from("enrollments")
-    .select(
-      "session_id, sessions(id, session_date, start_time, end_time, location, room, day, session_type, description, teacher:profiles!sessions_teacher_id_fkey(full_name))"
-    )
-    .eq("student_id", userId);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("ministry_id, preferred_day")
+    .eq("id", userId)
+    .single();
 
-  return (enrollments ?? [])
-    .map((e) => e.sessions as unknown as StudentSession)
-    .filter((s) => s);
+  if (!profile?.ministry_id) return [];
+
+  let query = supabase
+    .from("sessions")
+    .select(SESSION_FIELDS)
+    .eq("session_type", "ministere")
+    .eq("ministry_id", profile.ministry_id);
+
+  if (profile.preferred_day) {
+    query = query.eq("day", profile.preferred_day);
+  }
+
+  const { data } = await query;
+  return (data ?? []) as unknown as StudentSession[];
 }
 
+/** Le tronc commun concerne tous les étudiants, quel que soit leur ministère. */
 async function getCommonSessions(supabase: SupabaseClient) {
   const { data } = await supabase
     .from("sessions")
-    .select("id, session_date, start_time, end_time, location, room, day, session_type, description")
+    .select(SESSION_FIELDS)
     .eq("session_type", "commun");
 
-  return (data ?? []).map((s) => ({ ...s, teacher: null })) as StudentSession[];
+  return (data ?? []) as unknown as StudentSession[];
+}
+
+function sortByDateThenTime(a: StudentSession, b: StudentSession) {
+  return (
+    a.session_date.localeCompare(b.session_date) || a.start_time.localeCompare(b.start_time)
+  );
 }
 
 export async function getStudentSessions(supabase: SupabaseClient, userId: string) {
@@ -84,7 +113,7 @@ export async function getStudentSessions(supabase: SupabaseClient, userId: strin
 
   return [...ministrySessions, ...commonSessions]
     .filter((s) => s.session_date >= today)
-    .sort((a, b) => a.session_date.localeCompare(b.session_date));
+    .sort(sortByDateThenTime);
 }
 
 export async function getStudentAllSessions(supabase: SupabaseClient, userId: string) {
@@ -93,9 +122,7 @@ export async function getStudentAllSessions(supabase: SupabaseClient, userId: st
     getCommonSessions(supabase),
   ]);
 
-  return [...ministrySessions, ...commonSessions].sort((a, b) =>
-    a.session_date.localeCompare(b.session_date)
-  );
+  return [...ministrySessions, ...commonSessions].sort(sortByDateThenTime);
 }
 
 export async function getStudentMaterials(supabase: SupabaseClient, sessionIds: string[]) {
@@ -121,4 +148,47 @@ export async function getStudentAssignments(supabase: SupabaseClient, sessionIds
     .order("created_at", { ascending: false });
 
   return data ?? [];
+}
+
+export type StudentCourse = {
+  id: string;
+  title: string;
+  description: string | null;
+  objectives: string | null;
+  sessions: StudentSession[];
+};
+
+/** Regroupe les séances de l'étudiant par cours, pour l'onglet « Mes cours ». */
+export async function getStudentCourses(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<StudentCourse[]> {
+  const sessions = await getStudentAllSessions(supabase, userId);
+  const withCourse = sessions.filter((s) => s.course_id && s.courses);
+
+  const courseIds = [...new Set(withCourse.map((s) => s.course_id as string))];
+  if (!courseIds.length) return [];
+
+  const { data } = await supabase
+    .from("courses")
+    .select("id, title, description, objectives")
+    .in("id", courseIds)
+    .order("title");
+
+  return (data ?? []).map((c) => ({
+    id: c.id as string,
+    title: c.title as string,
+    description: c.description as string | null,
+    objectives: c.objectives as string | null,
+    sessions: withCourse.filter((s) => s.course_id === c.id).sort(sortByDateThenTime),
+  }));
+}
+
+export async function getStudentCourse(
+  supabase: SupabaseClient,
+  userId: string,
+  courseId: string
+) {
+  const courses = await getStudentCourses(supabase, userId);
+  return courses.find((c) => c.id === courseId) ?? null;
 }

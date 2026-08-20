@@ -42,6 +42,7 @@ export default async function StudentDashboardPage() {
     location: s.location,
     room: s.room,
     teacher: s.teacher?.full_name ?? null,
+    course: s.courses?.title ?? null,
   }));
 
   return (
@@ -110,6 +111,11 @@ export default async function StudentDashboardPage() {
                 </p>
                 <SessionTypeBadge type={nextSession.session_type} />
               </div>
+              {nextSession.courses && (
+                <p className="text-sm font-medium text-foreground">
+                  {nextSession.courses.title}
+                </p>
+              )}
               <p className="text-sm text-muted">
                 {formatTimeRange(nextSession.start_time, nextSession.end_time)} ·{" "}
                 {nextSession.location}

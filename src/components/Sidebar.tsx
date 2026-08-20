@@ -140,6 +140,7 @@ const adminSections: NavSection[] = [
   {
     title: "Suivi",
     items: [
+      { label: "Cours", href: "/admin/cours", icon: icons.book },
       { label: "Séances", href: "/admin/seances", icon: icons.calendar },
       { label: "Utilisateurs", href: "/admin/utilisateurs", icon: icons.users },
     ],
